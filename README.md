@@ -1,5 +1,6 @@
-It has intersititial and rewarded ad features.
+At least it works.
 
+Fuck "react-native-google-mobile-ads"
 Supports:
 
 Android ✅
