@@ -8,11 +8,17 @@ version = '0.1.0'
 
 android {
   namespace "com.soleroks.bettermobileads"
+
   defaultConfig {
     versionCode 1
     versionName "0.1.0"
   }
+
   lintOptions {
     abortOnError false
   }
+}
+
+dependencies {
+  implementation("com.google.android.gms:play-services-ads:24.7.0")
 }

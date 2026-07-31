@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "BetterMobileAds is a smaller and more reliable Google AdMob Plugin for React Native",
   "main": "build/index.js",
-  "types": "build/index.d.ts",
   "scripts": {
     "build": "node internal/module_scripts/build.js",
     "clean": "node internal/module_scripts/clean.js",
@@ -26,11 +25,8 @@
   "author": "soleroks <82513212+soleroks@users.noreply.github.com> (https://github.com/soleroks)",
   "license": "MIT",
   "homepage": "https://github.com/soleroks/better-mobile-ads#readme",
-  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "@types/jest": "^29.2.1",
-    "@types/react": "~19.1.1",
     "babel-preset-expo": "~55.0.8",
     "eslint": "~9.39.4",
     "eslint-config-universe": "^15.0.3",
@@ -39,7 +35,7 @@
     "jest-expo": "~55.0.9",
     "prettier": "^3.0.0",
     "react-native": "0.82.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "jest": {
     "preset": "jest-expo",
