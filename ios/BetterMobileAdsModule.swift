@@ -7,7 +7,7 @@ public class BetterMobileAdsModule: Module {
     Events("onChange")
 
     Function("hello") {
-      return "Hello world! 👋"
+      return "I DONT HAVE A MAC."
     }
   }
 }

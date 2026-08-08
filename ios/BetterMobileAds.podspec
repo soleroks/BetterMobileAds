@@ -1,8 +1,8 @@
 Pod::Spec.new do |s|
   s.name           = 'BetterMobileAds'
   s.version        = '1.0.0'
-  s.summary        = 'A sample project summary'
-  s.description    = 'A sample project description'
+  s.summary        = 'BetterMobileAds is a smaller and more reliable Google AdMob Plugin for React Native '
+  s.description    = 'react-native-google-mobile-ads was insisting not to work. So I did my own wrapper. idk 9/10'
   s.author         = ''
   s.homepage       = 'https://docs.expo.dev/modules/'
   s.platforms      = {
