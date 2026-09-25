@@ -1,7 +1,7 @@
-const { withAndroidManifest } = require("@expo/config-plugins");
+const { withAndroidManifest, withInfoPlist } = require("@expo/config-plugins");
 
 module.exports = function withBetterMobileAds(config, props = {}) {
-  return withAndroidManifest(config, async (config) => {
+  config = withAndroidManifest(config, async (config) => {
     const androidManifest = config.modResults;
     const appId =
       props.androidAppId || "ca-app-pub-3940256099942544~3347511713";
@@ -23,6 +23,23 @@ module.exports = function withBetterMobileAds(config, props = {}) {
     });
 
     application["meta-data"] = metaDataList;
+    return config;
+  });
+
+  return withInfoPlist(config, (config) => {
+    const appId = props.iosAppId;
+    if (appId) {
+      config.modResults.GADApplicationIdentifier = appId;
+    }
+
+    if (Array.isArray(props.iosSkAdNetworkItems)) {
+      config.modResults.SKAdNetworkItems = props.iosSkAdNetworkItems.map(
+        (identifier) => ({
+          SKAdNetworkIdentifier: identifier,
+        }),
+      );
+    }
+
     return config;
   });
 };
