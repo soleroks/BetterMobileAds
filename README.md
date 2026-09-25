@@ -1,28 +1,13 @@
 # BetterMobileAds
 
-_At least it works._
+An Expo module wrapper for Google Mobile Ads interstitial and rewarded ads on Android and iOS.
 
-a simpler and reliable Google Mobile Ads wrapper for React Native
+See [DEVELOPMENT.md](./DEVELOPMENT.md) for installation, configuration, API usage, testing, release, and privacy/compliance guidance.
 
-Supports:
+## Platform support
 
-- Android ✅
-- iOS ❌ _(ik it's a deal breaker, i'll try to catch up when i buy a Mac)_
+- Android: Google Play services Ads SDK
+- iOS: Google Mobile Ads SDK
+- Web: unsupported (methods reject with an explicit error)
 
-## why?
-
-`react-native-google-mobile-ads` made by 40 year old vibe coders decided not to work at all _(you can be suffering from this too)_
-
-since i aint burning out on coding any time soon i decided to wrap the SDK around my own shit
-
-it compiles, it works, and it gets the job done _(probably)_
-
-## Status
-
-android works _(tried and tested on expo 57)_
-
-ios doesn't.
-
-PRs are welcome, especially if you own a Mac.
-
-fuck invertase.
+The module does not replace Google's User Messaging Platform (UMP), App Tracking Transparency (ATT), or your app's consent and privacy implementation. Complete those flows before requesting ads in production.

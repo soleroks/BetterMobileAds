@@ -7,6 +7,8 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import expo.modules.kotlin.Promise
@@ -17,20 +19,34 @@ class BetterMobileAdsModule : Module() {
 
   private var interstitialAd: InterstitialAd? = null
   private var rewardedAd: RewardedAd? = null
+  private var interstitialAdUnitId: String? = null
+  private var rewardedAdUnitId: String? = null
 
   override fun definition() = ModuleDefinition {
 
     Name("BetterMobileAds")
 
-    Events("onRewarded", "onAdDismissed", "onAdFailedToLoad")
+    Events("onRewarded", "onAdDismissed", "onAdFailedToLoad", "onAdFailedToShow")
 
-    Function("initialize") {
-      val activity = appContext.activityProvider?.currentActivity ?: return@Function false
-
-      Handler(Looper.getMainLooper()).post {
-        MobileAds.initialize(activity)
+    AsyncFunction("initialize") { options: Map<String, Any?>?, promise: Promise ->
+      interstitialAdUnitId = options?.get("interstitialAdUnitId") as? String
+      rewardedAdUnitId = options?.get("rewardedAdUnitId") as? String
+      if (options?.get("testMode") == true) {
+        interstitialAdUnitId = interstitialAdUnitId ?: "ca-app-pub-3940256099942544/1033173712"
+        rewardedAdUnitId = rewardedAdUnitId ?: "ca-app-pub-3940256099942544/5224354917"
       }
-      true
+      if (interstitialAdUnitId == null && rewardedAdUnitId == null) {
+        promise.reject("ERR_CONFIG_INVALID", "At least one ad unit ID is required. Use testMode only for development.", null)
+        return@AsyncFunction
+      }
+      val activity = appContext.activityProvider?.currentActivity
+      if (activity == null) {
+        promise.reject("ERR_ACTIVITY_NULL", "Activity is not available.", null)
+        return@AsyncFunction
+      }
+      Handler(Looper.getMainLooper()).post {
+        MobileAds.initialize(activity) { promise.resolve(true) }
+      }
     }
 
     Function("getVersion") {
@@ -45,16 +61,22 @@ class BetterMobileAdsModule : Module() {
         return@AsyncFunction
       }
 
+      val adUnitId = interstitialAdUnitId
+      if (adUnitId == null) {
+        promise.reject("ERR_NOT_INITIALIZED", "Initialize with an interstitial ad unit ID first.", null)
+        return@AsyncFunction
+      }
       Handler(Looper.getMainLooper()).post {
         try {
           val adRequest = AdRequest.Builder().build()
           InterstitialAd.load(
             activity,
-            "ca-app-pub-3940256099942544/1033173712", // Test Interstitial ID
+            adUnitId,
             adRequest,
             object : InterstitialAdLoadCallback() {
               override fun onAdLoaded(ad: InterstitialAd) {
                 interstitialAd = ad
+                ad.fullScreenContentCallback = fullScreenContentCallback("interstitial")
                 promise.resolve(true)
               }
 
@@ -103,16 +125,22 @@ class BetterMobileAdsModule : Module() {
         return@AsyncFunction
       }
 
+      val adUnitId = rewardedAdUnitId
+      if (adUnitId == null) {
+        promise.reject("ERR_NOT_INITIALIZED", "Initialize with a rewarded ad unit ID first.", null)
+        return@AsyncFunction
+      }
       Handler(Looper.getMainLooper()).post {
         try {
           val adRequest = AdRequest.Builder().build()
           RewardedAd.load(
             activity,
-            "ca-app-pub-3940256099942544/5224354917", 
+            adUnitId,
             adRequest,
             object : RewardedAdLoadCallback() {
               override fun onAdLoaded(ad: RewardedAd) {
                 rewardedAd = ad
+                ad.fullScreenContentCallback = fullScreenContentCallback("rewarded")
                 promise.resolve(true)
               }
 
@@ -158,6 +186,17 @@ class BetterMobileAdsModule : Module() {
           promise.reject("ERR_SHOW_FAILED", e.localizedMessage, e)
         }
       }
+    }
+
+  }
+
+  private fun fullScreenContentCallback(type: String) = object : FullScreenContentCallback() {
+    override fun onAdDismissedFullScreenContent() {
+      sendEvent("onAdDismissed", mapOf("type" to type))
+    }
+
+    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+      sendEvent("onAdFailedToShow", mapOf("type" to type, "error" to adError.message))
     }
   }
 }
